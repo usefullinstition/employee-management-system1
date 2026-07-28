@@ -1,16 +1,16 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../services/api";
 import { toast } from "react-toastify";
 
 
-function Login() {
+function Register() {
 
   const navigate = useNavigate();
 
 
   const [form, setForm] = useState({
+    name: "",
     email: "",
     password: "",
   });
@@ -35,33 +35,18 @@ function Login() {
 
     try {
 
-
-      const res = await API.post(
-        "/auth/login",
+      await API.post(
+        "/auth/register",
         form
       );
 
 
-      localStorage.setItem(
-        "token",
-        res.data.token
-      );
-
-
-      localStorage.setItem(
-        "user",
-        JSON.stringify(res.data.user)
-      );
-
-
-
       toast.success(
-        "Login Successful!"
+        "Account created successfully!"
       );
 
 
-
-      navigate("/");
+      navigate("/login");
 
 
     } catch (err) {
@@ -70,10 +55,9 @@ function Login() {
       console.log(err);
 
 
-
       toast.error(
         err.response?.data?.message ||
-        "Login Failed"
+        "Registration failed"
       );
 
 
@@ -92,7 +76,7 @@ function Login() {
 
 
       <h2 className="mb-4">
-        Admin Login
+        Register
       </h2>
 
 
@@ -101,47 +85,38 @@ function Login() {
 
 
         <input
-
           className="form-control mb-3"
-
-          type="email"
-
-          name="email"
-
-          placeholder="Email"
-
+          type="text"
+          name="name"
+          placeholder="Name"
           onChange={handleChange}
-
           required
-
         />
-
 
 
         <input
-
           className="form-control mb-3"
-
-          type="password"
-
-          name="password"
-
-          placeholder="Password"
-
+          type="email"
+          name="email"
+          placeholder="Email"
           onChange={handleChange}
-
           required
-
         />
 
 
+        <input
+          className="form-control mb-3"
+          type="password"
+          name="password"
+          placeholder="Password"
+          onChange={handleChange}
+          required
+        />
 
-        <button className="btn btn-primary w-100">
 
-          Login
-
+        <button className="btn btn-success w-100">
+          Register
         </button>
-
 
 
       </form>
@@ -154,4 +129,4 @@ function Login() {
 }
 
 
-export default Login;
+export default Register;

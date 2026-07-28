@@ -109,3 +109,38 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+body.dark {
+  background: #121212;
+  color: white;
+}
+
+body.dark .card {
+  background: #1f1f1f;
+  color: white;
+}
+
+body.dark .table {
+  color: white;
+}
+
+body.dark .table thead {
+  background: #333;
+}
+
+body.dark .form-control {
+  background: #2b2b2b;
+  color: white;
+  border-color: #444;
+}
+
+body.dark .navbar {
+  background: #1a1a1a !important;
+}
+
+body.dark .sidebar {
+  background: #181818;
+}
+
+body.dark .btn-outline-light {
+  color: white;
+}
