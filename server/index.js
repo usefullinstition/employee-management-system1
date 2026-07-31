@@ -30,13 +30,7 @@ app.use("/api/employees", employeeRoutes);
 app.get("/", (req, res) => {
   res.send("Employee Management API is running...");
 });
-app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://your-vercel-app.vercel.app"
-  ],
-  credentials: true
-}));
+
 // Server
 const PORT = process.env.PORT || 5000;
 
