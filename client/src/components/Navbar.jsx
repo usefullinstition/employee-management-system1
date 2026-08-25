@@ -1,12 +1,17 @@
 import { useNavigate } from "react-router-dom";
-import { FaMoon, FaSun } from "react-icons/fa";
+import {
+  FaMoon,
+  FaSun,
+  FaBars,
+} from "react-icons/fa";
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 
-function Navbar() {
+function Navbar({ sidebarOpen, setSidebarOpen }) {
   const navigate = useNavigate();
 
-  const user = JSON.parse(localStorage.getItem("user")) || {};
+  const user =
+    JSON.parse(localStorage.getItem("user")) || {};
 
   const [darkMode, setDarkMode] = useState(
     localStorage.getItem("theme") === "dark"
@@ -33,24 +38,42 @@ function Navbar() {
 
   return (
     <nav
-      className={`navbar shadow-sm px-4 d-flex justify-content-between align-items-center ${
-        darkMode ? "navbar-dark bg-dark" : "navbar-light bg-white"
+      className={`navbar shadow-sm px-3 d-flex justify-content-between align-items-center ${
+        darkMode
+          ? "navbar-dark bg-dark"
+          : "navbar-light bg-white"
       }`}
     >
-      <h4 className="mb-0">Employee Management System</h4>
+      <div className="d-flex align-items-center">
 
-      <button
-        className="btn btn-outline-secondary"
-        onClick={() => setDarkMode(!darkMode)}
-      >
-        {darkMode ? <FaSun /> : <FaMoon />}
-      </button>
+        <button
+          className="btn btn-outline-secondary d-md-none me-3"
+          onClick={() =>
+            setSidebarOpen(!sidebarOpen)
+          }
+        >
+          <FaBars />
+        </button>
+
+        <h5 className="mb-0">
+          Employee Management System
+        </h5>
+
+      </div>
 
       <div className="d-flex align-items-center">
-        <div className="me-3">
-          <strong>Welcome, {user?.name}</strong>
+
+        <button
+          className="btn btn-outline-secondary me-3"
+          onClick={() => setDarkMode(!darkMode)}
+        >
+          {darkMode ? <FaSun /> : <FaMoon />}
+        </button>
+
+        <div className="me-3 d-none d-md-block">
+          <strong>{user?.name}</strong>
           <br />
-          <small>Role: {user?.role}</small>
+          <small>{user?.role}</small>
         </div>
 
         <button
@@ -59,6 +82,7 @@ function Navbar() {
         >
           Logout
         </button>
+
       </div>
     </nav>
   );

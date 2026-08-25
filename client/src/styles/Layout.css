@@ -149,3 +149,65 @@ body{
 .employee-form button:hover{
     background:#1d4ed8;
 }
+/* ===========================
+   Responsive Layout
+=========================== */
+
+@media (max-width: 768px) {
+
+  .sidebar{
+    position: fixed;
+    left: -240px;
+    top: 0;
+    width: 240px;
+    height: 100%;
+    z-index: 999;
+    transition: .3s;
+  }
+
+  .sidebar.show{
+    left: 0;
+  }
+
+  .main{
+    width:100%;
+  }
+
+  .navbar{
+    padding:12px 15px;
+  }
+
+  .navbar h5{
+    font-size:16px;
+  }
+
+  .content{
+    padding:15px;
+  }
+
+  .employee-form{
+    width:100%;
+  }
+
+  .employee-table{
+    display:block;
+    overflow-x:auto;
+    white-space:nowrap;
+  }
+
+  .cards{
+    grid-template-columns:1fr;
+  }
+
+}
+
+/* Desktop */
+
+@media (min-width:769px){
+
+  .sidebar{
+    position:relative;
+    left:0 !important;
+  }
+
+}

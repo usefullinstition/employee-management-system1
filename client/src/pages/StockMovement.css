@@ -1,0 +1,138 @@
+.stock-movement-page {
+  padding: 30px;
+  min-height: 100vh;
+  background: #f6f8fb;
+}
+
+.stock-movement-header {
+  margin-bottom: 25px;
+}
+
+.stock-movement-header span {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #667085;
+}
+
+.stock-movement-header h1 {
+  margin: 8px 0;
+  font-size: 30px;
+  color: #172033;
+}
+
+.stock-movement-header p {
+  margin: 0;
+  color: #667085;
+}
+
+.movement-card {
+  max-width: 700px;
+  background: white;
+  border-radius: 14px;
+  padding: 25px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+}
+
+.movement-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.movement-tabs button {
+  border: 1px solid #e4e7ec;
+  background: #fff;
+  padding: 13px 10px;
+  border-radius: 9px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.movement-tabs button.active {
+  color: white;
+  border-color: #344054;
+  background: #344054;
+}
+
+.movement-description {
+  padding: 14px;
+  margin-bottom: 22px;
+  border-radius: 8px;
+  background: #f2f4f7;
+  color: #475467;
+  font-size: 14px;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 7px;
+  font-weight: 600;
+  color: #344054;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 15px;
+  outline: none;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #667085;
+}
+
+.movement-error {
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  background: #fef3f2;
+  color: #b42318;
+}
+
+.movement-success {
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  background: #ecfdf3;
+  color: #027a48;
+}
+
+.save-movement-btn {
+  width: 100%;
+  border: none;
+  border-radius: 8px;
+  padding: 13px;
+  background: #101828;
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.save-movement-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 650px) {
+  .stock-movement-page {
+    padding: 18px;
+  }
+
+  .movement-tabs {
+    grid-template-columns: 1fr;
+  }
+} 

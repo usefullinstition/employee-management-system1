@@ -2,79 +2,64 @@ const express = require("express");
 
 const router = express.Router();
 
-const upload = require("../config/multer");
-
 const protect = require("../middleware/authMiddleware");
 
 const {
-  getEmployees,
-  getEmployeeById,
-  addEmployee,
-  updateEmployee,
-  deleteEmployee,
-  restoreEmployee,
-} = require("../controllers/employeeController");
+  createPayroll,
+  getPayroll,
+  getPayrollById,
+  getPayslip,
+  markPayrollPaid,
+} = require("../controllers/payrollController");
 
 // =====================================
-// GET ALL EMPLOYEES
+// GET ALL PAYROLL
 // =====================================
 
 router.get(
   "/",
   protect,
-  getEmployees
+  getPayroll
 );
 
 // =====================================
-// GET ONE EMPLOYEE
-// =====================================
-
-router.get(
-  "/:id",
-  protect,
-  getEmployeeById
-);
-
-// =====================================
-// ADD EMPLOYEE
+// CREATE PAYROLL
 // =====================================
 
 router.post(
   "/",
   protect,
-  upload.single("photo"),
-  addEmployee
+  createPayroll
 );
 
 // =====================================
-// UPDATE EMPLOYEE
+// GET ONE PAYROLL
+// =====================================
+
+router.get(
+  "/:id",
+  protect,
+  getPayrollById
+);
+
+// =====================================
+// MARK PAYROLL AS PAID
 // =====================================
 
 router.put(
-  "/:id",
+  "/:id/pay",
   protect,
-  upload.single("photo"),
-  updateEmployee
+  markPayrollPaid
 );
 
 // =====================================
-// DELETE / DEACTIVATE EMPLOYEE
+// GET PAYSLIP
 // =====================================
 
-router.delete(
-  "/:id",
+router.get(
+  "/:id/payslip",
   protect,
-  deleteEmployee
-);
-
-// =====================================
-// RESTORE EMPLOYEE
-// =====================================
-
-router.patch(
-  "/:id/restore",
-  protect,
-  restoreEmployee
+  getPayslip
 );
 
 module.exports = router;
