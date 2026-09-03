@@ -1,203 +1,316 @@
-/* =====================================
-   SIDEBAR
-===================================== */
+/* =========================================
+   SIDEBAR - PROFESSIONAL
+========================================= */
 
 .sidebar {
   position: fixed;
   top: 0;
   left: 0;
 
-  width: 270px;
+  width: 260px;
   height: 100vh;
 
   background: #ffffff;
-  border-right: 1px solid #eeeeee;
+  border-right: 1px solid #e5e7eb;
 
   display: flex;
   flex-direction: column;
 
-  padding: 22px 16px;
-
   z-index: 1000;
 
-  overflow-y: auto;
+  overflow: hidden;
 
-  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.04);
+  box-shadow: 4px 0 18px rgba(0, 0, 0, 0.04);
 }
 
 
-/* =====================================
+/* =========================================
    LOGO
-===================================== */
+========================================= */
 
 .sidebar-logo {
+  flex-shrink: 0;
+
   display: flex;
   align-items: center;
+
   gap: 12px;
 
-  padding: 4px 8px 25px;
+  padding: 22px 18px;
 
   border-bottom: 1px solid #eeeeee;
-  margin-bottom: 20px;
 }
 
 .logo-mark {
   width: 42px;
   height: 42px;
 
+  flex-shrink: 0;
+
   border-radius: 50%;
 
-  background: #e21b2d;
-  color: white;
+  background: #e31837;
+  color: #ffffff;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  font-size: 24px;
+  font-size: 23px;
   font-weight: 800;
+
+  box-shadow: 0 5px 12px rgba(227, 24, 55, 0.20);
 }
 
-.sidebar-logo h2 {
+.logo-text {
+  min-width: 0;
+}
+
+.logo-text h2 {
   margin: 0;
 
-  font-size: 18px;
-  font-weight: 700;
+  color: #111827;
 
-  color: #222;
+  font-size: 17px;
+  font-weight: 750;
+
+  line-height: 1.2;
 }
 
-.sidebar-logo span {
-  font-size: 11px;
-  color: #888;
+.logo-text span {
+  display: block;
 
+  margin-top: 3px;
+
+  color: #9ca3af;
+
+  font-size: 10px;
+  font-weight: 600;
+
+  letter-spacing: 0.7px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 
-/* =====================================
+/* =========================================
+   MENU SCROLL AREA
+========================================= */
+
+.sidebar-menu {
+  flex: 1;
+
+  min-height: 0;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  padding: 16px 12px 20px;
+}
+
+
+/* scrollbar */
+
+.sidebar-menu::-webkit-scrollbar {
+  width: 5px;
+}
+
+.sidebar-menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-menu::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 10px;
+}
+
+
+/* =========================================
    SECTION
-===================================== */
+========================================= */
 
 .sidebar-section {
-  margin-bottom: 10px;
+  width: 100%;
+
+  margin-bottom: 7px;
 }
 
 
-/* =====================================
+/* =========================================
    SECTION TITLE
-===================================== */
+========================================= */
 
 .section-title {
   width: 100%;
-
-  border: none;
-  background: transparent;
+  min-height: 40px;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  padding: 11px 10px;
+  padding: 0 12px;
 
-  cursor: pointer;
+  border: none;
+  outline: none;
 
-  color: #8a8a8a;
+  background: transparent;
 
-  font-size: 11px;
-  font-weight: 700;
+  color: #9ca3af;
+
+  font-size: 10px;
+  font-weight: 800;
 
   letter-spacing: 1px;
 
   text-align: left;
+
+  cursor: pointer;
+
+  border-radius: 8px;
+
+  transition:
+    color 0.2s ease,
+    background 0.2s ease;
 }
 
 .section-title:hover {
-  color: #e21b2d;
+  color: #e31837;
+  background: #fff7f8;
 }
 
-.section-title svg {
+.section-title:focus {
+  outline: none;
+}
+
+
+/* =========================================
+   CHEVRON
+========================================= */
+
+.chevron {
   font-size: 10px;
 
   transition: transform 0.25s ease;
 }
 
-.section-title .rotate {
+.chevron.rotate {
   transform: rotate(180deg);
 }
 
 
-/* =====================================
-   MENU ITEMS
-===================================== */
+/* =========================================
+   SECTION ITEMS
+========================================= */
 
 .section-items {
+  width: 100%;
+
   display: flex;
   flex-direction: column;
 
-  gap: 4px;
+  gap: 3px;
 
-  margin-bottom: 10px;
+  overflow: hidden;
+
+  max-height: 0;
+
+  opacity: 0;
+
+  transform: translateY(-4px);
+
+  transition:
+    max-height 0.28s ease,
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.section-items.open {
+  max-height: 500px;
+
+  opacity: 1;
+
+  transform: translateY(0);
 }
 
 
-/* =====================================
+/* =========================================
    SIDEBAR LINK
-===================================== */
+========================================= */
 
 .sidebar-link {
   position: relative;
 
+  width: 100%;
+  min-height: 44px;
+
   display: flex;
   align-items: center;
 
-  gap: 13px;
+  gap: 12px;
 
-  padding: 11px 13px;
+  padding: 0 13px;
+
+  margin: 2px 0;
+
+  box-sizing: border-box;
 
   border-radius: 9px;
 
   text-decoration: none;
 
-  color: #555;
+  color: #4b5563;
 
-  font-size: 14px;
+  font-size: 13.5px;
+  font-weight: 500;
 
-  transition: all 0.2s ease;
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.15s ease;
 }
+
+
+/* icon */
 
 .sidebar-link svg {
   width: 16px;
+  min-width: 16px;
 
-  color: #777;
+  color: #6b7280;
 
   transition: color 0.2s ease;
 }
 
-.sidebar-link:hover {
-  background: #fff1f2;
 
-  color: #e21b2d;
+/* hover */
+
+.sidebar-link:hover {
+  background: #fff1f3;
+
+  color: #e31837;
+
+  transform: translateX(2px);
 }
 
 .sidebar-link:hover svg {
-  color: #e21b2d;
+  color: #e31837;
 }
 
 
-/* =====================================
-   ACTIVE LINK
-===================================== */
+/* =========================================
+   ACTIVE
+========================================= */
 
 .sidebar-link.active {
-  background: #e21b2d;
+  background: #e31837;
 
   color: #ffffff;
 
-  font-weight: 600;
+  font-weight: 650;
 
-  box-shadow: 0 5px 12px rgba(226, 27, 45, 0.18);
+  box-shadow:
+    0 5px 12px rgba(227, 24, 55, 0.20);
 }
 
 .sidebar-link.active svg {
@@ -205,57 +318,88 @@
 }
 
 
-/* =====================================
-   BOTTOM
-===================================== */
+/* prevent active from changing on hover */
+
+.sidebar-link.active:hover {
+  background: #e31837;
+
+  color: #ffffff;
+
+  transform: none;
+}
+
+.sidebar-link.active:hover svg {
+  color: #ffffff;
+}
+
+
+/* =========================================
+   LOGOUT
+========================================= */
 
 .sidebar-bottom {
-  margin-top: auto;
+  flex-shrink: 0;
 
-  padding-top: 15px;
+  padding: 12px;
+
+  background: #ffffff;
 
   border-top: 1px solid #eeeeee;
 }
 
 .logout-sidebar {
   width: 100%;
-
-  border: none;
-  background: transparent;
+  min-height: 44px;
 
   display: flex;
   align-items: center;
 
-  gap: 13px;
+  gap: 12px;
 
-  padding: 11px 13px;
+  padding: 0 13px;
 
+  border: none;
   border-radius: 9px;
 
-  color: #666;
+  background: transparent;
 
-  font-size: 14px;
+  color: #6b7280;
+
+  font-size: 13.5px;
+  font-weight: 500;
 
   cursor: pointer;
 
-  transition: all 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.logout-sidebar svg {
+  width: 16px;
 }
 
 .logout-sidebar:hover {
-  background: #fff1f2;
-  color: #e21b2d;
+  background: #fff1f3;
+
+  color: #e31837;
 }
 
 
-/* =====================================
+/* =========================================
    MOBILE
-===================================== */
+========================================= */
 
 @media (max-width: 768px) {
+
   .sidebar {
+    width: 260px;
+
     transform: translateX(-100%);
 
     transition: transform 0.3s ease;
+
+    box-shadow: 8px 0 25px rgba(0, 0, 0, 0.12);
   }
 
   .sidebar.show {

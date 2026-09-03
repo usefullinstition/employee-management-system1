@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
@@ -7,16 +7,12 @@ import Sidebar from "./components/Sidebar";
 import Dashboard from "./pages/Dashboard";
 import Employees from "./pages/Employees";
 import AddEmployee from "./pages/AddEmployee";
-
-import SalaryAdvance from "./pages/SalaryAdvance";
 import EditEmployee from "./pages/EditEmployee";
 
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Profile from "./pages/Profile";
+import SalaryAdvance from "./pages/SalaryAdvance";
 import Payroll from "./pages/Payroll";
 import PayrollHistory from "./pages/PayrollHistory";
-import ChangePassword from "./pages/ChangePassword";
+import Payslip from "./pages/Payslip";
 
 import Products from "./pages/Products";
 import AddProduct from "./pages/AddProduct";
@@ -24,31 +20,63 @@ import StockHistory from "./pages/StockHistory";
 import DailyStock from "./pages/DailyStock";
 import StockMovement from "./pages/StockMovement";
 
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Profile from "./pages/Profile";
+import ChangePassword from "./pages/ChangePassword";
+
 import ProtectedRoute from "./components/ProtectedRoute";
-import Payslip from "./pages/Payslip";
+
 import "./styles/Layout.css";
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  return (
-    <div className="layout">
-      <Sidebar
-        sidebarOpen={sidebarOpen}
-        setSidebarOpen={setSidebarOpen}
-      />
+  const location = useLocation();
 
-      <div className="main">
-        <Navbar
+  const isAuthPage =
+    location.pathname === "/login" ||
+    location.pathname === "/register";
+
+  return (
+    <div
+      className={`layout ${
+        isAuthPage ? "auth-layout" : ""
+      }`}
+    >
+
+      {/* =================================
+          SIDEBAR
+      ================================== */}
+
+      {!isAuthPage && (
+        <Sidebar
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
         />
+      )}
 
-        <div className="content">
+
+      {/* =================================
+          MAIN AREA
+      ================================== */}
+
+      <div className="main">
+
+        {!isAuthPage && (
+          <Navbar
+            sidebarOpen={sidebarOpen}
+            setSidebarOpen={setSidebarOpen}
+          />
+        )}
+
+
+        <main className="content">
+
           <Routes>
 
             {/* =========================
-                PUBLIC ROUTES
+                PUBLIC
             ========================== */}
 
             <Route
@@ -132,7 +160,7 @@ function App() {
 
 
             {/* =========================
-                SALARY ADVANCE
+                PAYROLL
             ========================== */}
 
             <Route
@@ -144,13 +172,6 @@ function App() {
               }
             />
 
-        
-
-
-            {/* =========================
-                PAYROLL
-            ========================== */}
-
             <Route
               path="/payroll"
               element={
@@ -159,14 +180,25 @@ function App() {
                 </ProtectedRoute>
               }
             />
-<Route
-  path="/payroll-history"
-  element={
-    <ProtectedRoute>
-      <PayrollHistory />
-    </ProtectedRoute>
-  }
-/>
+
+            <Route
+              path="/payroll-history"
+              element={
+                <ProtectedRoute>
+                  <PayrollHistory />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/payroll/:id/payslip"
+              element={
+                <ProtectedRoute>
+                  <Payslip />
+                </ProtectedRoute>
+              }
+            />
+
 
             {/* =========================
                 PRODUCTS
@@ -221,17 +253,13 @@ function App() {
                 </ProtectedRoute>
               }
             />
-<Route
-  path="/payroll/:id/payslip"
-  element={
-    <ProtectedRoute>
-      <Payslip />
-    </ProtectedRoute>
-  }
-/>
+
           </Routes>
-        </div>
+
+        </main>
+
       </div>
+
     </div>
   );
 }

@@ -289,7 +289,17 @@ const updateEmployee = async (req, res) => {
     if (salary !== undefined) {
       employee.salary = Number(salary);
     }
+if (salary !== undefined) {
+  const salaryNumber = Number(salary);
 
+  if (!salaryNumber || salaryNumber <= 0) {
+    return res.status(400).json({
+      message: "Salary must be greater than 0",
+    });
+  }
+
+  employee.salary = salaryNumber;
+}
     if (salaryAdvance !== undefined) {
       employee.salaryAdvance =
         Number(salaryAdvance) || 0;

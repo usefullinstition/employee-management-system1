@@ -1,0 +1,102 @@
+/* =========================================
+   GLOBAL
+========================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+
+  min-height: 100%;
+}
+
+body {
+  background: #f5f7fb;
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+}
+
+
+/* =========================================
+   LAYOUT
+========================================= */
+
+.layout {
+  min-height: 100vh;
+
+  width: 100%;
+}
+
+
+/* =========================================
+   MAIN
+========================================= */
+
+.main {
+  min-height: 100vh;
+
+  margin-left: 260px;
+
+  width: calc(100% - 260px);
+
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* =========================================
+   NAVBAR
+========================================= */
+
+.navbar {
+  position: sticky;
+
+  top: 0;
+
+  z-index: 900;
+
+  min-height: 70px;
+
+  background: #ffffff;
+
+  border-bottom: 1px solid #eeeeee;
+
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+
+/* =========================================
+   CONTENT
+========================================= */
+
+.content {
+  width: 100%;
+
+  padding: 25px;
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 768px) {
+
+  .main {
+    margin-left: 0;
+
+    width: 100%;
+  }
+
+  .content {
+    padding: 18px 15px;
+  }
+}

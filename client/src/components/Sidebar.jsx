@@ -1,5 +1,7 @@
+
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
+
 import {
   FaHome,
   FaUsers,
@@ -12,16 +14,45 @@ import {
   FaChevronDown,
   FaSignOutAlt,
   FaExchangeAlt,
+  FaMoneyBillWave,
+  FaFileInvoiceDollar,
 } from "react-icons/fa";
 
-function Sidebar({ sidebarOpen, setSidebarOpen }) {
-  const [openSection, setOpenSection] = useState("main");
+import "./Sidebar.css";
 
-  const toggleSection = (section) => {
-    setOpenSection((prev) =>
-      prev === section ? null : section
-    );
-  };
+function Sidebar({ sidebarOpen, setSidebarOpen }) {
+  // =====================================
+  // EACH SECTION HAS ITS OWN STATE
+  // =====================================
+
+  const [openSections, setOpenSections] = useState({
+    main: true,
+    payroll: true,
+    inventory: true,
+    account: true,
+  });
+
+  // =====================================
+  // TOGGLE SECTION
+  // =====================================
+
+  const [openSection, setOpenSection] = useState({
+  main: true,
+  payroll: true,
+  inventory: true,
+  account: true,
+});
+
+const toggleSection = (section) => {
+  setOpenSection((prev) => ({
+    ...prev,
+    [section]: !prev[section],
+  }));
+};
+
+  // =====================================
+  // CLOSE MOBILE SIDEBAR
+  // =====================================
 
   const closeSidebar = () => {
     if (setSidebarOpen) {
@@ -29,51 +60,97 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
     }
   };
 
-  return (
-    <aside className={`sidebar ${sidebarOpen ? "show" : ""}`}>
+  // =====================================
+  // ACTIVE LINK
+  // =====================================
 
-      {/* ============================= */}
-      {/* LOGO */}
-      {/* ============================= */}
+  const linkClass = ({ isActive }) =>
+    `sidebar-link ${isActive ? "active" : ""}`;
+
+  // =====================================
+  // LOGOUT
+  // =====================================
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    closeSidebar();
+
+    window.location.href = "/login";
+  };
+
+  return (
+    <aside
+      className={`sidebar ${
+        sidebarOpen ? "show" : ""
+      }`}
+    >
+
+      {/* =====================================
+          LOGO
+      ===================================== */}
 
       <div className="sidebar-logo">
-        <div className="logo-mark">C</div>
 
-        <div>
+        <div className="logo-mark">
+          C
+        </div>
+
+        <div className="logo-text">
           <h2>Coca-Cola</h2>
           <span>Employee System</span>
         </div>
+
       </div>
 
 
-      {/* ============================= */}
-      {/* MAIN MENU */}
-      {/* ============================= */}
+      {/* =====================================
+          MENU
+      ===================================== */}
 
-      <div className="sidebar-section">
+      <div className="sidebar-menu">
 
-        <button
-          className="section-title"
-          onClick={() => toggleSection("main")}
-        >
-          <span>MAIN MENU</span>
 
-          <FaChevronDown
-            className={
-              openSection === "main"
-                ? "rotate"
-                : ""
+        {/* =====================================
+            MAIN MENU
+        ===================================== */}
+
+        <div className="sidebar-section">
+
+          <button
+            type="button"
+            className="section-title"
+            onClick={() =>
+              toggleSection("main")
             }
-          />
-        </button>
+          >
+
+            <span>MAIN MENU</span>
+
+            <FaChevronDown
+              className={
+                openSections.main
+                  ? "chevron rotate"
+                  : "chevron"
+              }
+            />
+
+          </button>
 
 
-        {openSection === "main" && (
-          <div className="section-items">
+          <div
+            className={`section-items ${
+              openSections.main
+                ? "open"
+                : ""
+            }`}
+          >
 
             <NavLink
               to="/"
-              className="sidebar-link"
+              end
+              className={linkClass}
               onClick={closeSidebar}
             >
               <FaHome />
@@ -83,7 +160,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
             <NavLink
               to="/employees"
-              className="sidebar-link"
+              className={linkClass}
               onClick={closeSidebar}
             >
               <FaUsers />
@@ -93,7 +170,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
             <NavLink
               to="/add-employee"
-              className="sidebar-link"
+              className={linkClass}
               onClick={closeSidebar}
             >
               <FaUserPlus />
@@ -101,92 +178,117 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
             </NavLink>
 
           </div>
-        )}
-      </div>
 
-<div className="sidebar-section">
+        </div>
 
-  <button
-    className="section-title"
-    onClick={() =>
-      toggleSection("payroll")
-    }
-  >
-    <span>PAYROLL</span>
 
-    <FaChevronDown
-      className={
-        openSection === "payroll"
-          ? "rotate"
-          : ""
-      }
-    />
-  </button>
+        {/* =====================================
+            PAYROLL
+        ===================================== */}
 
-  {openSection === "payroll" && (
-    <div className="section-items">
+        <div className="sidebar-section">
 
-      <NavLink
-        to="/salary-advance"
-        className="sidebar-link"
-        onClick={closeSidebar}
-      >
-        💵
-        <span>Salary Advances</span>
-      </NavLink>
-
-      <NavLink
-        to="/payroll"
-        className="sidebar-link"
-        onClick={closeSidebar}
-      >
-        💰
-        <span>Payroll</span>
-      </NavLink>
-
-      <NavLink
-        to="/payroll-history"
-        className="sidebar-link"
-        onClick={closeSidebar}
-      >
-        📋
-        <span>Payroll History</span>
-      </NavLink>
-
-    </div>
-  )}
-
-</div>
-      {/* ============================= */}
-      {/* INVENTORY */}
-      {/* ============================= */}
-
-      <div className="sidebar-section">
-
-        <button
-          className="section-title"
-          onClick={() =>
-            toggleSection("inventory")
-          }
-        >
-          <span>INVENTORY</span>
-
-          <FaChevronDown
-            className={
-              openSection === "inventory"
-                ? "rotate"
-                : ""
+          <button
+            type="button"
+            className="section-title"
+            onClick={() =>
+              toggleSection("payroll")
             }
-          />
-        </button>
+          >
+
+            <span>PAYROLL</span>
+
+            <FaChevronDown
+              className={
+                openSections.payroll
+                  ? "chevron rotate"
+                  : "chevron"
+              }
+            />
+
+          </button>
 
 
-        {openSection === "inventory" && (
-          <div className="section-items">
+          <div
+            className={`section-items ${
+              openSections.payroll
+                ? "open"
+                : ""
+            }`}
+          >
+
+            <NavLink
+              to="/salary-advance"
+              className={linkClass}
+              onClick={closeSidebar}
+            >
+              <FaMoneyBillWave />
+              <span>Salary Advances</span>
+            </NavLink>
+
+
+            <NavLink
+              to="/payroll"
+              className={linkClass}
+              onClick={closeSidebar}
+            >
+              <FaFileInvoiceDollar />
+              <span>Payroll</span>
+            </NavLink>
+
+
+            <NavLink
+              to="/payroll-history"
+              className={linkClass}
+              onClick={closeSidebar}
+            >
+              <FaHistory />
+              <span>Payroll History</span>
+            </NavLink>
+
+          </div>
+
+        </div>
+
+
+        {/* =====================================
+            INVENTORY
+        ===================================== */}
+
+        <div className="sidebar-section">
+
+          <button
+            type="button"
+            className="section-title"
+            onClick={() =>
+              toggleSection("inventory")
+            }
+          >
+
+            <span>INVENTORY</span>
+
+            <FaChevronDown
+              className={
+                openSections.inventory
+                  ? "chevron rotate"
+                  : "chevron"
+              }
+            />
+
+          </button>
+
+
+          <div
+            className={`section-items ${
+              openSections.inventory
+                ? "open"
+                : ""
+            }`}
+          >
 
             <NavLink
               to="/products"
-              className="sidebar-link"
+              className={linkClass}
               onClick={closeSidebar}
             >
               <FaBox />
@@ -196,7 +298,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
             <NavLink
               to="/add-product"
-              className="sidebar-link"
+              className={linkClass}
               onClick={closeSidebar}
             >
               <FaPlus />
@@ -206,7 +308,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
             <NavLink
               to="/stock-movement"
-              className="sidebar-link"
+              className={linkClass}
               onClick={closeSidebar}
             >
               <FaExchangeAlt />
@@ -216,7 +318,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
             <NavLink
               to="/stock-history"
-              className="sidebar-link"
+              className={linkClass}
               onClick={closeSidebar}
             >
               <FaHistory />
@@ -226,7 +328,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
             <NavLink
               to="/daily-stock"
-              className="sidebar-link"
+              className={linkClass}
               onClick={closeSidebar}
             >
               <FaChartBar />
@@ -234,40 +336,48 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
             </NavLink>
 
           </div>
-        )}
-      </div>
+
+        </div>
 
 
-      {/* ============================= */}
-      {/* ACCOUNT */}
-      {/* ============================= */}
+        {/* =====================================
+            ACCOUNT
+        ===================================== */}
 
-      <div className="sidebar-section">
+        <div className="sidebar-section">
 
-        <button
-          className="section-title"
-          onClick={() =>
-            toggleSection("account")
-          }
-        >
-          <span>ACCOUNT</span>
-
-          <FaChevronDown
-            className={
-              openSection === "account"
-                ? "rotate"
-                : ""
+          <button
+            type="button"
+            className="section-title"
+            onClick={() =>
+              toggleSection("account")
             }
-          />
-        </button>
+          >
+
+            <span>ACCOUNT</span>
+
+            <FaChevronDown
+              className={
+                openSections.account
+                  ? "chevron rotate"
+                  : "chevron"
+              }
+            />
+
+          </button>
 
 
-        {openSection === "account" && (
-          <div className="section-items">
+          <div
+            className={`section-items ${
+              openSections.account
+                ? "open"
+                : ""
+            }`}
+          >
 
             <NavLink
               to="/change-password"
-              className="sidebar-link"
+              className={linkClass}
               onClick={closeSidebar}
             >
               <FaLock />
@@ -275,19 +385,28 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
             </NavLink>
 
           </div>
-        )}
+
+        </div>
+
       </div>
 
 
-      {/* ============================= */}
-      {/* BOTTOM */}
-      {/* ============================= */}
+      {/* =====================================
+          LOGOUT
+      ===================================== */}
 
       <div className="sidebar-bottom">
 
-        <button className="logout-sidebar">
+        <button
+          type="button"
+          className="logout-sidebar"
+          onClick={handleLogout}
+        >
+
           <FaSignOutAlt />
+
           <span>Logout</span>
+
         </button>
 
       </div>
@@ -297,3 +416,4 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
 }
 
 export default Sidebar;
+

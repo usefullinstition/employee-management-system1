@@ -71,7 +71,7 @@ router.delete(
 // RESTORE EMPLOYEE
 // =====================================
 
-router.patch(
+router.put(
   "/:id/restore",
   protect,
   restoreEmployee

@@ -1,0 +1,66 @@
+/* =========================================
+   PAYROLL HISTORY
+========================================= */
+
+.payroll-history-page {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+
+/* =========================================
+   CARD
+========================================= */
+
+.payroll-history-page .card {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+
+/* =========================================
+   TABLE WRAPPER
+========================================= */
+
+.payroll-history-page .table-responsive {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+
+/* =========================================
+   TABLE
+========================================= */
+
+.payroll-history-page table {
+  width: 100%;
+  min-width: 1100px;
+  margin: 0;
+}
+
+
+/* =========================================
+   TABLE CELLS
+========================================= */
+
+.payroll-history-page th,
+.payroll-history-page td {
+  white-space: nowrap;
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 768px) {
+
+  .payroll-history-page {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+}

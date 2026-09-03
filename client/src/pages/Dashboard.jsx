@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+
 import API from "../services/api";
 import {
   BarChart,
@@ -77,7 +78,26 @@ const COLORS = [
 
   return (
     <div className="container mt-4">
+  <div className="dashboard-hero-content">
+    <div>
+      <div className="dashboard-brand">
+        Coca-Cola
+      </div>
 
+      <h2>
+        Employee Management System
+      </h2>
+
+      <p>
+        Welcome back 👋 Manage employees, payroll
+        and inventory from one place.
+      </p>
+    </div>
+
+    <div className="dashboard-logo-watermark">
+      C
+    </div>
+  </div>
       <h2 className="mb-4">Dashboard</h2>
 
       <div className="row">

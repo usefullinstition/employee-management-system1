@@ -1,5 +1,6 @@
 const DailyStock = require("../models/DailyStock");
 const Product = require("../models/Product");
+const protect = require("../middleware/authMiddleware");
 
 // =====================================
 // GET DAILY STOCK
@@ -7,35 +8,49 @@ const Product = require("../models/Product");
 
 const getDailyStock = async (req, res) => {
   try {
-    const { date } = req.query;
+    console.log("========== DAILY STOCK AUTH ==========");
+    console.log("Authorization:", req.headers.authorization);
+    console.log("REQ.USER:", req.user);
+    console.log("COMPANY ID:", req.user?.companyId);
+    console.log("======================================");
 
-    if (!req.user || !req.user.companyId) {
+    if (!req.user?.companyId) {
       return res.status(401).json({
         message: "Company information is missing",
       });
     }
 
     const companyId = req.user.companyId;
+    const { date } = req.query;
 
-    let query = {
+    const query = {
       companyId,
     };
 
     if (date) {
-      const start = new Date(date);
-      start.setHours(0, 0, 0, 0);
+      const start = new Date(`${date}T00:00:00.000Z`);
+      const end = new Date(`${date}T23:59:59.999Z`);
 
-      const end = new Date(start);
-      end.setDate(end.getDate() + 1);
+      if (
+        Number.isNaN(start.getTime()) ||
+        Number.isNaN(end.getTime())
+      ) {
+        return res.status(400).json({
+          message: "Invalid date",
+        });
+      }
 
       query.date = {
         $gte: start,
-        $lt: end,
+        $lte: end,
       };
     }
 
     const records = await DailyStock.find(query)
-      .populate("product", "name brand flavor packaging sizeMl sizeUnit unit")
+      .populate(
+        "product",
+        "name brand flavor packaging sizeMl sizeUnit unit"
+      )
       .sort({
         date: -1,
         createdAt: -1,
@@ -46,7 +61,8 @@ const getDailyStock = async (req, res) => {
     console.error("GET DAILY STOCK ERROR:", error);
 
     return res.status(500).json({
-      message: "Failed to fetch daily stock",
+      message:
+        error.message || "Failed to fetch daily stock",
     });
   }
 };
@@ -65,13 +81,21 @@ const saveDailyStock = async (req, res) => {
       purchase = 0,
     } = req.body;
 
-    if (!req.user || !req.user.companyId) {
+    // =====================================
+    // AUTH
+    // =====================================
+
+    if (!req.user?.companyId) {
       return res.status(401).json({
         message: "Company information is missing",
       });
     }
 
     const companyId = req.user.companyId;
+
+    // =====================================
+    // VALIDATION
+    // =====================================
 
     if (!productId) {
       return res.status(400).json({
@@ -85,6 +109,10 @@ const saveDailyStock = async (req, res) => {
       });
     }
 
+    // =====================================
+    // FIND PRODUCT
+    // =====================================
+
     const product = await Product.findOne({
       _id: productId,
       companyId,
@@ -96,14 +124,50 @@ const saveDailyStock = async (req, res) => {
       });
     }
 
-    const selectedDate = new Date(date);
-    selectedDate.setHours(0, 0, 0, 0);
+    // =====================================
+    // DATE
+    // =====================================
 
-    const nextDate = new Date(selectedDate);
-    nextDate.setDate(nextDate.getDate() + 1);
+    const selectedDate = new Date(
+      `${date}T00:00:00.000Z`
+    );
+
+    if (Number.isNaN(selectedDate.getTime())) {
+      return res.status(400).json({
+        message: "Invalid date",
+      });
+    }
 
     // =====================================
-    // FIND PREVIOUS DAY
+    // NUMBERS
+    // =====================================
+
+    const outQty = Number(saleOut);
+    const inQty = Number(saleIn);
+    const purchaseQty = Number(purchase);
+
+    if (
+      !Number.isFinite(outQty) ||
+      !Number.isFinite(inQty) ||
+      !Number.isFinite(purchaseQty)
+    ) {
+      return res.status(400).json({
+        message: "Stock quantities must be valid numbers",
+      });
+    }
+
+    if (
+      outQty < 0 ||
+      inQty < 0 ||
+      purchaseQty < 0
+    ) {
+      return res.status(400).json({
+        message: "Stock quantities cannot be negative",
+      });
+    }
+
+    // =====================================
+    // FIND PREVIOUS DAILY RECORD
     // =====================================
 
     const previousRecord = await DailyStock.findOne({
@@ -117,7 +181,7 @@ const saveDailyStock = async (req, res) => {
     });
 
     // =====================================
-    // BEGINNING
+    // BEGINNING STOCK
     // =====================================
 
     let beginning;
@@ -129,21 +193,7 @@ const saveDailyStock = async (req, res) => {
     }
 
     // =====================================
-    // NUMBERS
-    // =====================================
-
-    const outQty = Number(saleOut) || 0;
-    const inQty = Number(saleIn) || 0;
-    const purchaseQty = Number(purchase) || 0;
-
-    if (outQty < 0 || inQty < 0 || purchaseQty < 0) {
-      return res.status(400).json({
-        message: "Stock quantities cannot be negative",
-      });
-    }
-
-    // =====================================
-    // ENDING
+    // ENDING STOCK
     // =====================================
 
     const ending =
@@ -155,6 +205,11 @@ const saveDailyStock = async (req, res) => {
     if (ending < 0) {
       return res.status(400).json({
         message: "Insufficient stock",
+        beginning,
+        saleOut: outQty,
+        saleIn: inQty,
+        purchase: purchaseQty,
+        ending,
       });
     }
 
@@ -162,28 +217,35 @@ const saveDailyStock = async (req, res) => {
     // SAVE DAILY RECORD
     // =====================================
 
-    const record = await DailyStock.findOneAndUpdate(
-      {
-        companyId,
-        product: productId,
-        date: selectedDate,
-      },
-      {
-        companyId,
-        product: productId,
-        date: selectedDate,
-        beginning,
-        saleOut: outQty,
-        saleIn: inQty,
-        purchase: purchaseQty,
-        ending,
-      },
-      {
-        new: true,
-        upsert: true,
-        runValidators: true,
-      }
-    );
+    const record =
+      await DailyStock.findOneAndUpdate(
+        {
+          companyId,
+          product: productId,
+          date: selectedDate,
+        },
+        {
+          $set: {
+            companyId,
+            product: productId,
+            date: selectedDate,
+            beginning,
+            saleOut: outQty,
+            saleIn: inQty,
+            purchase: purchaseQty,
+            ending,
+          },
+        },
+        {
+          new: true,
+          upsert: true,
+          runValidators: true,
+          setDefaultsOnInsert: true,
+        }
+      ).populate(
+        "product",
+        "name brand flavor packaging sizeMl sizeUnit unit"
+      );
 
     return res.status(200).json({
       message: "Daily stock saved successfully",
@@ -193,10 +255,16 @@ const saveDailyStock = async (req, res) => {
     console.error("SAVE DAILY STOCK ERROR:", error);
 
     return res.status(500).json({
-      message: error.message || "Failed to save daily stock",
+      message:
+        error.message ||
+        "Failed to save daily stock",
     });
   }
 };
+
+// =====================================
+// EXPORT
+// =====================================
 
 module.exports = {
   getDailyStock,

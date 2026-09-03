@@ -83,6 +83,7 @@ const register = async (req, res) => {
         email: company.email,
       },
     });
+
   } catch (error) {
     console.error("REGISTER ERROR:", error);
 
@@ -97,7 +98,10 @@ const register = async (req, res) => {
 // ======================================================
 const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const {
+      email,
+      password,
+    } = req.body;
 
     // Find user
     const user = await User.findOne({ email });
@@ -140,8 +144,7 @@ const login = async (req, res) => {
     // Check companyId
     if (!user.companyId) {
       return res.status(400).json({
-        message:
-          "User does not have a companyId",
+        message: "User does not have a companyId",
       });
     }
 
@@ -179,10 +182,12 @@ const login = async (req, res) => {
 
     console.log("========== RESPONSE USER ==========");
     console.log(loginResponse.user);
+
     console.log(
       "RESPONSE COMPANY ID:",
       loginResponse.user.companyId
     );
+
     console.log("===================================");
 
     return res.status(200).json(loginResponse);
@@ -197,9 +202,131 @@ const login = async (req, res) => {
 };
 
 // ======================================================
+// CHANGE PASSWORD
+// ======================================================
+const changePassword = async (req, res) => {
+  try {
+    console.log("");
+    console.log("=================================");
+    console.log("====== CHANGE PASSWORD DEBUG =====");
+    console.log("=================================");
+
+    console.log("USER ID:", req.user?.id);
+
+    console.log("BODY:", {
+      currentPassword: req.body.currentPassword
+        ? "YES"
+        : "NO",
+
+      newPassword: req.body.newPassword
+        ? "YES"
+        : "NO",
+
+      confirmPassword: req.body.confirmPassword
+        ? "YES"
+        : "NO",
+    });
+
+    const {
+      currentPassword,
+      newPassword,
+      confirmPassword,
+    } = req.body;
+
+    // Check required fields
+    if (
+      !currentPassword ||
+      !newPassword ||
+      !confirmPassword
+    ) {
+      return res.status(400).json({
+        message:
+          "Current password, new password and confirm password are required",
+      });
+    }
+
+    // Check new passwords match
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({
+        message: "New passwords do not match",
+      });
+    }
+
+    // Check minimum password length
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        message:
+          "New password must be at least 6 characters",
+      });
+    }
+
+    // Find logged-in user
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    console.log("USER FOUND:", user.email);
+
+    // Check current password
+    const isMatch = await bcrypt.compare(
+      currentPassword,
+      user.password
+    );
+
+    console.log(
+      "CURRENT PASSWORD MATCH:",
+      isMatch
+    );
+
+    if (!isMatch) {
+      return res.status(400).json({
+        message: "Current password is incorrect",
+      });
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(
+      newPassword,
+      10
+    );
+
+    // Save new password
+    user.password = hashedPassword;
+
+    await user.save();
+
+    console.log(
+      "PASSWORD UPDATED SUCCESSFULLY"
+    );
+
+    console.log("=================================");
+    console.log("");
+
+    return res.status(200).json({
+      message: "Password changed successfully",
+    });
+
+  } catch (error) {
+    console.error(
+      "CHANGE PASSWORD ERROR:",
+      error
+    );
+
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+// ======================================================
 // EXPORT
 // ======================================================
 module.exports = {
   register,
   login,
+  changePassword,
 };

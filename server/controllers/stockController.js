@@ -258,104 +258,245 @@ const getTransactions = async (req, res) => {
 // DAILY SUMMARY
 // =====================================
 
+
+
+// =====================================
+// DAILY SUMMARY
+// =====================================
+
+
+// =====================================
+// DAILY SUMMARY
+// =====================================
+
+// =====================================
+// DAILY SUMMARY
+// =====================================
+
 const getDailySummary = async (req, res) => {
   try {
     const companyId = getCompanyId(req, res);
     if (!companyId) return;
 
-    const { date } = req.query;
+    // -------------------------------------
+    // SELECTED DATE
+    // -------------------------------------
 
-    const transactions = await StockTransaction.find({
+    const selectedDate =
+      req.query.date ||
+      new Date().toISOString().split("T")[0];
+
+    const startOfDay = new Date(
+      `${selectedDate}T00:00:00.000Z`
+    );
+
+    const endOfDay = new Date(
+      `${selectedDate}T23:59:59.999Z`
+    );
+
+    // -------------------------------------
+    // GET ALL PRODUCTS
+    // -------------------------------------
+
+    const products = await Product.find({
       companyId,
-    })
-      .populate("product", "name brand")
-      .sort({ createdAt: 1 });
+    }).select(
+      "name brand flavor sizeMl sizeUnit unit packaging openingStock currentStock"
+    );
 
-    const dailyMap = {};
+    // -------------------------------------
+    // GET TRANSACTIONS UP TO SELECTED DATE
+    // -------------------------------------
 
-    for (const transaction of transactions) {
-      if (!transaction.product) continue;
+    const transactions =
+      await StockTransaction.find({
+        companyId,
+        createdAt: {
+          $lte: endOfDay,
+        },
+      })
+        .populate(
+          "product",
+          "name brand flavor sizeMl sizeUnit unit packaging"
+        )
+        .sort({
+          createdAt: 1,
+        });
 
-      const transactionDate = new Date(transaction.createdAt)
-        .toISOString()
-        .split("T")[0];
+    // -------------------------------------
+    // DAILY SUMMARY MAP
+    // -------------------------------------
 
-      // If frontend selected a date,
-      // only return that date.
-      if (date && transactionDate !== date) {
-        continue;
+    const summaryMap = {};
+
+    // -------------------------------------
+    // PROCESS EACH PRODUCT
+    // -------------------------------------
+
+    for (const product of products) {
+      const productId = product._id.toString();
+
+      // -----------------------------------
+      // FIND TRANSACTIONS FOR THIS PRODUCT
+      // -----------------------------------
+
+      const productTransactions =
+        transactions.filter(
+          (transaction) =>
+            transaction.product &&
+            transaction.product._id.toString() === productId
+        );
+
+      // -----------------------------------
+      // FIND LAST TRANSACTION BEFORE TODAY
+      // -----------------------------------
+
+      let beginning;
+
+      const previousTransactions =
+        productTransactions.filter(
+          (transaction) =>
+            new Date(transaction.createdAt) <
+            startOfDay
+        );
+
+      if (previousTransactions.length > 0) {
+        const lastPreviousTransaction =
+          previousTransactions[
+            previousTransactions.length - 1
+          ];
+
+        beginning =
+          Number(
+            lastPreviousTransaction.newStock
+          ) || 0;
+      } else {
+        // ---------------------------------
+        // NO PREVIOUS TRANSACTION
+        // USE PRODUCT OPENING STOCK
+        // ---------------------------------
+
+        beginning =
+          Number(product.openingStock) || 0;
       }
 
-      const productId = transaction.product._id.toString();
+      // -----------------------------------
+      // TODAY'S TRANSACTIONS
+      // -----------------------------------
 
-      const key = `${transactionDate}_${productId}`;
+      const todayTransactions =
+        productTransactions.filter(
+          (transaction) => {
+            const transactionDate =
+              new Date(transaction.createdAt);
 
-      if (!dailyMap[key]) {
-        dailyMap[key] = {
-          date: transactionDate,
+            return (
+              transactionDate >= startOfDay &&
+              transactionDate <= endOfDay
+            );
+          }
+        );
 
-          product: transaction.product,
+      // -----------------------------------
+      // MOVEMENT TOTALS
+      // -----------------------------------
 
-          beginning:
-            Number(transaction.previousStock) || 0,
+      let saleOut = 0;
+      let saleIn = 0;
+      let purchase = 0;
 
-          saleOut: 0,
+      for (const transaction of todayTransactions) {
+        const quantity =
+          Number(transaction.quantity) || 0;
 
-          saleIn: 0,
+        switch (transaction.type) {
+          case "SALE_OUT":
+            saleOut += quantity;
+            break;
 
-          purchase: 0,
+          case "SALE_IN":
+            saleIn += quantity;
+            break;
 
-          ending:
-            Number(transaction.newStock) || 0,
-        };
+          case "PURCHASE":
+            purchase += quantity;
+            break;
+
+          default:
+            // Ignore old IN / OUT transactions
+            // in the new daily stock calculation.
+            break;
+        }
       }
 
-      const quantity =
-        Number(transaction.quantity) || 0;
+      // -----------------------------------
+      // CALCULATE ENDING
+      // -----------------------------------
 
-     switch (transaction.type) {
-  case "SALE_OUT":
-    dailyMap[key].saleOut += quantity;
-    break;
+      const ending =
+        beginning -
+        saleOut +
+        saleIn +
+        purchase;
 
-  case "SALE_IN":
-    dailyMap[key].saleIn += quantity;
-    break;
+      // -----------------------------------
+      // CREATE ONE ROW PER PRODUCT
+      // -----------------------------------
 
-  case "PURCHASE":
-    dailyMap[key].purchase += quantity;
-    break;
+      summaryMap[productId] = {
+        date: selectedDate,
 
-  default:
-    break;
-}
+        product: {
+          _id: product._id,
+          name: product.name,
+          brand: product.brand,
+          flavor: product.flavor,
+          sizeMl: product.sizeMl,
+          sizeUnit: product.sizeUnit,
+          unit: product.unit,
+          packaging: product.packaging,
+        },
 
-      dailyMap[key].ending =
-        Number(transaction.newStock) || 0;
+        beginning,
+
+        saleOut,
+
+        saleIn,
+
+        purchase,
+
+        ending,
+
+        calculatedEnding: ending,
+      };
     }
 
-    const summary = Object.values(dailyMap).map(
-      (item) => ({
-        ...item,
+    // -------------------------------------
+    // CONVERT MAP TO ARRAY
+    // -------------------------------------
 
-        calculatedEnding:
-          item.beginning -
-          item.saleOut +
-          item.saleIn +
-          item.purchase,
-      })
+    const summary =
+      Object.values(summaryMap);
+
+    // -------------------------------------
+    // SORT BY PRODUCT NAME
+    // -------------------------------------
+
+    summary.sort((a, b) =>
+      (a.product?.name || "").localeCompare(
+        b.product?.name || ""
+      )
     );
 
-    summary.sort(
-      (a, b) =>
-        new Date(b.date) -
-        new Date(a.date)
-    );
+    // -------------------------------------
+    // RESPONSE
+    // -------------------------------------
 
     return res.status(200).json({
-      date: date || null,
+      date: selectedDate,
       summary,
     });
+
   } catch (error) {
     console.error(
       "GET DAILY SUMMARY ERROR:",
@@ -369,6 +510,11 @@ const getDailySummary = async (req, res) => {
     });
   }
 };
+
+
+
+
+
 
 module.exports = {
   purchaseStock,

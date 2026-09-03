@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import API from "../services/API";
 import "./DailyStock.css";
@@ -8,58 +9,73 @@ const DailyStock = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
- 
-const fetchDailyStock = async (selectedDate = "") => {
-  try {
-    setLoading(true);
-    setError("");
+  // =====================================
+  // FETCH DAILY STOCK
+  // =====================================
 
-    const url = selectedDate
-      ? `/stock/daily-summary?date=${selectedDate}`
-      : "/stock/daily-summary";
+  const fetchDailyStock = async (selectedDate = "") => {
+    try {
+      setLoading(true);
+      setError("");
 
-    const response = await API.get(url);
+      const url = selectedDate
+        ? `/stock/daily-summary?date=${selectedDate}`
+        : "/stock/daily-summary";
 
-    console.log("DAILY STOCK RESPONSE:", response.data);
+      const response = await API.get(url);
 
-    const data = response.data;
+      console.log("=================================");
+      console.log("DAILY STOCK FULL RESPONSE:");
+      console.log(response.data);
+      console.log("=================================");
 
-    
-    if (Array.isArray(data)) {
-      setSummary(data);
-    } else {
-      setSummary(
-        Array.isArray(data?.summary)
-          ? data.summary
-          : []
+      const data = response.data;
+
+      // Backend response:
+      // {
+      //   date: "2026-08-31",
+      //   summary: [...]
+      // }
+
+      if (Array.isArray(data?.summary)) {
+        setSummary(data.summary);
+      } else if (Array.isArray(data)) {
+        setSummary(data);
+      } else {
+        setSummary([]);
+      }
+
+      if (data?.date) {
+        setDate(data.date);
+      }
+    } catch (err) {
+      console.error(
+        "DAILY STOCK ERROR:",
+        err.response?.data || err
       );
+
+      setError(
+        err.response?.data?.message ||
+          "Failed to load daily stock"
+      );
+
+      setSummary([]);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    if (data?.date) {
-      setDate(data.date);
-    }
-  } catch (err) {
-    console.error(
-      "DAILY STOCK ERROR:",
-      err.response?.data || err
-    );
-
-    setError(
-      err.response?.data?.message ||
-        "Failed to load daily stock"
-    );
-
-    setSummary([]);
-  } finally {
-    setLoading(false);
-  }
-};
-
-
+  // =====================================
+  // LOAD ON PAGE OPEN
+  // =====================================
 
   useEffect(() => {
     fetchDailyStock();
   }, []);
+
+  // =====================================
+  // DATE CHANGE
+  // =====================================
 
   const handleDateChange = (event) => {
     const selectedDate = event.target.value;
@@ -73,14 +89,27 @@ const fetchDailyStock = async (selectedDate = "") => {
     }
   };
 
+  // =====================================
+  // CALCULATE ENDING
+  // =====================================
+
   const calculateEnding = (item) => {
     const beginning = Number(item.beginning) || 0;
     const saleOut = Number(item.saleOut) || 0;
     const saleIn = Number(item.saleIn) || 0;
     const purchase = Number(item.purchase) || 0;
 
-    return beginning - saleOut + saleIn + purchase;
+    return (
+      beginning -
+      saleOut +
+      saleIn +
+      purchase
+    );
   };
+
+  // =====================================
+  // LOADING
+  // =====================================
 
   if (loading) {
     return (
@@ -91,6 +120,10 @@ const fetchDailyStock = async (selectedDate = "") => {
       </div>
     );
   }
+
+  // =====================================
+  // ERROR
+  // =====================================
 
   if (error) {
     return (
@@ -109,6 +142,10 @@ const fetchDailyStock = async (selectedDate = "") => {
       </div>
     );
   }
+
+  // =====================================
+  // PAGE
+  // =====================================
 
   return (
     <div className="daily-stock-page">
@@ -153,7 +190,7 @@ const fetchDailyStock = async (selectedDate = "") => {
       </div>
 
       {/* ================================
-          FLOW
+          STOCK FLOW
       ================================= */}
 
       <div className="stock-flow">
@@ -194,7 +231,7 @@ const fetchDailyStock = async (selectedDate = "") => {
       </div>
 
       {/* ================================
-          TABLE
+          TABLE CARD
       ================================= */}
 
       <div className="daily-stock-table-card">
@@ -257,14 +294,14 @@ const fetchDailyStock = async (selectedDate = "") => {
                     <tr
                       key={
                         item.product?._id ||
-                        Math.random()
+                        item._id
                       }
                     >
 
                       {/* DATE */}
 
                       <td>
-                        {date || "-"}
+                        {item.date || date || "-"}
                       </td>
 
                       {/* PRODUCT */}
@@ -344,3 +381,4 @@ const fetchDailyStock = async (selectedDate = "") => {
 };
 
 export default DailyStock;
+

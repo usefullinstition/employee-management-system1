@@ -230,8 +230,8 @@ function Products() {
 
       const endpoint =
         stockModal.type === "IN"
-          ? "/stock/in"
-          : "/stock/out";
+          ? "/stock/purchase"
+    : "/stock/sale-out";
 
       const response = await API.post(endpoint, {
         productId: product._id,

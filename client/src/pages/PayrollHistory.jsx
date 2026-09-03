@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../services/api";
 import { toast } from "react-toastify";
-
+import "./PayrollHistory.css";
 function PayrollHistory() {
   const navigate = useNavigate();
 
@@ -157,7 +157,7 @@ function PayrollHistory() {
 
   if (loading) {
     return (
-      <div className="container mt-5 text-center">
+      <div className="payroll-history-page container-fluid mt-4 mb-5">
         <div className="spinner-border" />
 
         <p className="mt-3">
