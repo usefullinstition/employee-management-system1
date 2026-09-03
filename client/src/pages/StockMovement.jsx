@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import API from "../services/API";
+import API from "../services/api";
 import "./StockMovement.css";
 
 const StockMovement = () => {
