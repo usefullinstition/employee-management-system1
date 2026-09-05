@@ -30,7 +30,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://employee-management-system1-theta.vercel.app",
+     "https://employee-management-system-psi-umber.vercel.app",
     ],
     credentials: true,
   })
