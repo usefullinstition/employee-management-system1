@@ -5,7 +5,7 @@ const router = express.Router();
 const upload = require("../config/multer");
 
 const protect = require("../middleware/authMiddleware");
-
+const { adminOnly } = require("../middleware/roleMiddleware");
 const {
   getEmployees,
   getEmployeeById,
@@ -64,6 +64,7 @@ router.put(
 router.delete(
   "/:id",
   protect,
+   adminOnly,
   deleteEmployee
 );
 
@@ -74,6 +75,7 @@ router.delete(
 router.put(
   "/:id/restore",
   protect,
+   adminOnly,
   restoreEmployee
 );
 
